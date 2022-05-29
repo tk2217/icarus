@@ -1,6 +1,6 @@
-//! # Daedalus
+//! # Icarus
 //!
-//! Daedalus is a library which provides models and methods to fetch metadata about games
+//! Icarus is a library which provides models and methods to fetch metadata about games
 
 #![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
 
