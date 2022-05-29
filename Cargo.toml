@@ -1,6 +1,5 @@
 [workspace]
 
 members = [
-    "daedalus",
-    "daedalus_client"
+    "daedalus"
 ]
