@@ -1,5 +1,5 @@
 use crate::modded::{Processor, SidedDataEntry};
-use crate::{download_file, Error};
+use crate::{Icarus, Result};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -41,7 +41,7 @@ pub struct Version {
     pub id: String,
     #[serde(rename = "type")]
     /// The release type of the version
-    pub type_: VersionType,
+    pub version_type: VersionType,
     /// A link to additional information about the version
     pub url: String,
     /// The latest time a file in this version was updated
@@ -84,11 +84,15 @@ pub struct VersionManifest {
 pub const VERSION_MANIFEST_URL: &str =
     "https://launchermeta.mojang.com/mc/game/version_manifest_v2.json";
 
-/// Fetches a version manifest from the specified URL. If no URL is specified, the default is used.
-pub async fn fetch_version_manifest(url: Option<&str>) -> Result<VersionManifest, Error> {
-    Ok(serde_json::from_slice(
-        &download_file(url.unwrap_or(VERSION_MANIFEST_URL), None).await?,
-    )?)
+impl Icarus {
+    /// Fetches a version manifest from the specified URL. If no URL is specified, the default is used.
+    pub async fn fetch_version_manifest(&self, url: Option<&str>) -> Result<VersionManifest> {
+        Ok(serde_json::from_slice(
+            &self
+                .download_file(url.unwrap_or(VERSION_MANIFEST_URL), None)
+                .await?,
+        )?)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -348,11 +352,15 @@ pub struct VersionInfo {
     pub processors: Option<Vec<Processor>>,
 }
 
-/// Fetches detailed information about a version from the manifest
-pub async fn fetch_version_info(version: &Version) -> Result<VersionInfo, Error> {
-    Ok(serde_json::from_slice(
-        &download_file(&version.url, Some(&version.sha1)).await?,
-    )?)
+impl Icarus {
+    /// Fetches detailed information about a version from the manifest
+    pub async fn fetch_version_info(&self, version: &Version) -> Result<VersionInfo> {
+        Ok(serde_json::from_slice(
+            &self
+                .download_file(&version.url, Some(&version.sha1))
+                .await?,
+        )?)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -371,9 +379,13 @@ pub struct AssetsIndex {
     pub objects: HashMap<String, Asset>,
 }
 
-/// Fetches the assets index from the version info
-pub async fn fetch_assets_index(version: &VersionInfo) -> Result<AssetsIndex, Error> {
-    Ok(serde_json::from_slice(
-        &download_file(&version.asset_index.url, Some(&version.asset_index.sha1)).await?,
-    )?)
+impl Icarus {
+    /// Fetches the assets index from the version info
+    pub async fn fetch_assets_index(&self, version: &VersionInfo) -> Result<AssetsIndex> {
+        Ok(serde_json::from_slice(
+            &self
+                .download_file(&version.asset_index.url, Some(&version.asset_index.sha1))
+                .await?,
+        )?)
+    }
 }

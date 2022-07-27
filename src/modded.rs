@@ -1,4 +1,4 @@
-use crate::{download_file, Error};
+use crate::{Icarus, Result};
 
 use crate::minecraft::{Argument, ArgumentType, Library, VersionInfo, VersionType};
 use chrono::{DateTime, Utc};
@@ -71,9 +71,13 @@ pub struct Processor {
     pub sides: Option<Vec<String>>,
 }
 
-/// Fetches the version manifest of a game version's URL
-pub async fn fetch_partial_version(url: &str) -> Result<PartialVersionInfo, Error> {
-    Ok(serde_json::from_slice(&download_file(url, None).await?)?)
+impl Icarus {
+    /// Fetches the version manifest of a game version's URL
+    pub async fn fetch_partial_version(&self, url: &str) -> Result<PartialVersionInfo> {
+        Ok(serde_json::from_slice(
+            &self.download_file(url, None).await?,
+        )?)
+    }
 }
 
 /// Merges a partial version into a complete one
@@ -161,7 +165,11 @@ pub struct LoaderVersion {
     pub stable: bool,
 }
 
-/// Fetches the manifest of a mod loader
-pub async fn fetch_manifest(url: &str) -> Result<Manifest, Error> {
-    Ok(serde_json::from_slice(&download_file(url, None).await?)?)
+impl Icarus {
+    /// Fetches the manifest of a mod loader
+    pub async fn fetch_manifest(&self, url: &str) -> Result<Manifest> {
+        Ok(serde_json::from_slice(
+            &self.download_file(url, None).await?,
+        )?)
+    }
 }
